@@ -15,17 +15,7 @@ pipeline {
         URL_REPO_GITOPS     =   "https://github.com/dsantafe/295devops-jenkins-challenge-gitops"
     }
 
-    stages {
-        stage("Cleanup Workspace"){
-            steps {
-                cleanWs()
-            }
-        }    
-        stage("Checkout from SCM"){
-            steps {
-                git branch: 'main', credentialsId: 'github', url: "${URL_REPO}"
-            }
-        }
+    stages {        
         stage("Login DockerHub"){
             steps {
                sh 'docker login --username=${DOCKER_HUB_LOGIN_USR} --password=${DOCKER_HUB_LOGIN_PSW}'
