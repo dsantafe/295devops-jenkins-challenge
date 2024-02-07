@@ -1,0 +1,102 @@
+pipeline {
+    agent any
+    environment {
+        APP_RESULT          =   "result"
+        APP_VOTE            =   "vote"
+        APP_WORKER          =   "worker"
+        RELEASE             =   "1.0.0"
+        REGISTRY            =   "dsantafe"
+        IMAGE_RESULT        =   "${REGISTRY}" + "/" + "${APP_RESULT}"
+        IMAGE_VOTE          =   "${REGISTRY}" + "/" + "${APP_VOTE}"
+        IMAGE_WORKER        =   "${REGISTRY}" + "/" + "${APP_WORKER}"
+        IMAGE_TAG           =   "${RELEASE}-${BUILD_NUMBER}"
+        DOCKER_HUB_LOGIN    =   credentials('dockerhub')
+        ULR_REPO            =   "https://github.com/dsantafe/295devops-jenkins-challenge"
+        URL_REPO_GITOPS     =   "https://github.com/dsantafe/295devops-jenkins-challenge-gitops"
+    }
+
+    stages {
+        stage("Cleanup Workspace"){
+            steps {
+                cleanWs()
+            }
+        }    
+        stage("Checkout from SCM"){
+            steps {
+                git branch: 'main', credentialsId: 'github', url: "${URL_REPO}"
+            }
+        }
+        stage("Login DockerHub"){
+            steps {
+               sh 'docker login --username=${DOCKER_HUB_LOGIN_USR} --password=${DOCKER_HUB_LOGIN_PSW}'
+            }
+        }
+        stage("Build & Push Docker Image") {
+            parallel{
+                stage("Result App"){
+                    steps {
+                        sh '''
+                            docker build -t ${IMAGE_RESULT} result/               
+                            docker tag ${IMAGE_RESULT} ${IMAGE_RESULT}:${IMAGE_TAG}
+                            docker push ${IMAGE_RESULT}:${IMAGE_TAG}
+                            docker push ${IMAGE_RESULT}:latest
+                        '''
+                    }
+                }
+                stage("Vote App") {
+                    steps {
+                        sh '''
+                            docker build -t ${IMAGE_VOTE} vote/               
+                            docker tag ${IMAGE_VOTE} ${IMAGE_VOTE}:${IMAGE_TAG}
+                            docker push ${IMAGE_VOTE}:${IMAGE_TAG}
+                            docker push ${IMAGE_VOTE}:latest
+                        '''
+                    }
+                } 
+                stage("Worker App") {
+                    steps {
+                        sh '''
+                            docker build -t ${IMAGE_WORKER} worker/               
+                            docker tag ${IMAGE_WORKER} ${IMAGE_WORKER}:${IMAGE_TAG}
+                            docker push ${IMAGE_WORKER}:${IMAGE_TAG}
+                            docker push ${IMAGE_WORKER}:latest
+                        '''
+                    }
+                }
+            }            
+        }
+        stage("Checkout from SCM GitOps"){
+            steps {
+                dir("295devops-jenkins-k8s-gitops") {
+                    git branch: 'main', credentialsId: 'github', url: "${URL_REPO_GITOPS}"
+                }
+            }
+        }
+        stage("Update Deployment Tags"){
+            steps {
+                dir("295devops-jenkins-k8s-gitops") {
+                    sh '''               
+                        sed -i -- "s|${IMAGE_RESULT}.*|${IMAGE_RESULT}:${IMAGE_TAG}|g"    result-deployment.yml                        
+                        sed -i -- "s|${IMAGE_VOTE}.*|${IMAGE_VOTE}:${IMAGE_TAG}|g"        vote-deployment.yml
+                        sed -i -- "s|${IMAGE_WORKER}.*|${IMAGE_WORKER}:${IMAGE_TAG}|g"    worker-deployment.yml
+                    '''
+                }
+            }
+        }
+        stage("Push Changed Deployment File"){
+            steps {
+                dir("295devops-jenkins-k8s-gitops") {
+                    withCredentials([gitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
+                        sh '''
+                            git add result-deployment.yml
+                            git add vote-deployment.yml
+                            git add worker-deployment.yml
+                            git commit -m "Updated Deployment Manifest Jenkinsfile"
+                            git push -u origin main
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
