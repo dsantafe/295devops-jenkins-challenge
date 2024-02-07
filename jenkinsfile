@@ -76,9 +76,9 @@ pipeline {
             steps {
                 dir("295devops-jenkins-k8s-gitops") {
                     sh '''               
-                        sed -i -- "s|${IMAGE_RESULT}.*|${IMAGE_RESULT}:${IMAGE_TAG}|g"    result-deployment.yml                        
-                        sed -i -- "s|${IMAGE_VOTE}.*|${IMAGE_VOTE}:${IMAGE_TAG}|g"        vote-deployment.yml
-                        sed -i -- "s|${IMAGE_WORKER}.*|${IMAGE_WORKER}:${IMAGE_TAG}|g"    worker-deployment.yml
+                        sed -i -- "s|${IMAGE_RESULT}.*|${IMAGE_RESULT}:${IMAGE_TAG}|g"    dev/result-deployment.yml                        
+                        sed -i -- "s|${IMAGE_VOTE}.*|${IMAGE_VOTE}:${IMAGE_TAG}|g"        dev/vote-deployment.yml
+                        sed -i -- "s|${IMAGE_WORKER}.*|${IMAGE_WORKER}:${IMAGE_TAG}|g"    dev/worker-deployment.yml
                     '''
                 }
             }
