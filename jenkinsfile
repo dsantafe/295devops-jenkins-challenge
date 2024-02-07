@@ -88,5 +88,29 @@ pipeline {
                 }
             }
         }
+        stage('Deploy and Notify') {
+            steps {
+                echo "Despliegue completado exitosamente"
+                mail bcc: '', 
+                    body: "The deployment has been ${currentBuild.currentResult}. Details:\n\nBuild number: ${BUILD_NUMBER}\nProject: ${JOB_NAME}\nBuild URL: ${BUILD_URL}",
+                    cc: '', 
+                    from: '', 
+                    replyTo: '', 
+                    subject: "${JOB_NAME}: Build status is ${currentBuild.currentResult}", 
+                    to: 'santafedavid01@gmail.com'
+            }
+        }
+    }
+
+    post {
+        failure {
+            mail bcc: '', 
+                body: "The deployment has been ${currentBuild.currentResult}. Details:\n\nBuild number: ${BUILD_NUMBER}\nProject: ${JOB_NAME}\nBuild URL: ${BUILD_URL}",
+                cc: '', 
+                from: '', 
+                replyTo: '', 
+                subject: "${JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
+                to: 'santafedavid01@gmail.com'
+            }
     }
 }
