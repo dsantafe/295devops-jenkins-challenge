@@ -88,9 +88,9 @@ pipeline {
                 dir("295devops-jenkins-k8s-gitops") {
                     withCredentials([gitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
                         sh '''
-                            git add result-deployment.yml
-                            git add vote-deployment.yml
-                            git add worker-deployment.yml
+                            git add dev/result-deployment.yml
+                            git add dev/vote-deployment.yml
+                            git add dev/worker-deployment.yml
                             git commit -m "Updated Deployment Manifest Jenkinsfile"
                             git push -u origin main
                         '''
