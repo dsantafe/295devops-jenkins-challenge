@@ -37,6 +37,8 @@ Flujo: Una vez realizado un cambio en el código fuente por el desarrollador, es
     - [Application Repository](https://github.com/dsantafe/295devops-jenkins-challenge)
     - [DevOps Repository](https://github.com/dsantafe/295devops-jenkins-challenge-gitops)
 
+---
+
 2. Construcción del Pipeline en Jenkins
 
 - Instala Jenkins en tu entorno local o en una máquina virtual. 
@@ -48,9 +50,7 @@ Flujo: Una vez realizado un cambio en el código fuente por el desarrollador, es
     - Construcción del Backend con Node.js
     - Despliegue en Minikube
 
-    
-
-- Pipeline en Jenkins, Stages implementados (jenkinsfile)
+### Pipeline en Jenkins, Stages implementados (jenkinsfile)
 1. Login DockerHub. (Debes crear las credenciales en Jenkins usando el token generado desde el repositorio de DockerHub)
 
     ![credentials-dockerhub](./assets/credentials-dockerhub.jpg)
@@ -63,12 +63,15 @@ Flujo: Una vez realizado un cambio en el código fuente por el desarrollador, es
     ![credentials-github](./assets/credentials-github.jpg)
 
 6. Deploy and Notify. (Se notifica via email el resultado del despliegue del pipeline, para ellos debes configurar las notificaciones desde Jenkins usando el token generado desde Gmail)
+
 ---
 
 3. Creación de Objetos de Kubernetes
 
 - Crea archivos YAML separados para cada objeto de Kubernetes que represente los componentes de la aplicación (Deployment, Service, PersistentVolume, etc.).
     - Los manifiestos de Kubernetes tipo Deployment, Service y PersistentVolume se encuentran en el siguiente repositorio [DevOps Repository](https://github.com/dsantafe/295devops-jenkins-challenge-gitops)
+
+---
 
 4. Creación de Imágenes Docker
 
@@ -77,10 +80,14 @@ Flujo: Una vez realizado un cambio en el código fuente por el desarrollador, es
 - Utiliza Jenkins para construir y etiquetar las imágenes Docker.
     - La construcción y etiquetado de las imágenes Docker se realiza en el stage de Jenkins denominado "Build & Push Docker Image".
 
+---
+
 5. Publicación en Docker Hub usando Jenkins
 
 - Configura Jenkins para autenticarse y publicar las imágenes Docker en un repositorio en Docker Hub.
     - La publicación en Docker Hub se realiza en el stage de Jenkins denominado "Build & Push Docker Image".
+
+---
 
 6. Notificación y Monitoreo
 
@@ -89,6 +96,8 @@ Flujo: Una vez realizado un cambio en el código fuente por el desarrollador, es
 - Implementa monitoreo básico para la aplicación desplegada en Minikube.
 
     ![jenkins-pipeline-notify](./assets/jenkins-pipeline-notify.jpg)
+
+---
 
 7. Documentación
 
